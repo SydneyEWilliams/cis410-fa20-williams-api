@@ -28,6 +28,8 @@ app.post("/contacts", async (req,res)=>{
     if(existingUser[0]){
         return res.status(409).send("Please enter a different email")
     }
+
+    
 })
 
 
@@ -84,3 +86,8 @@ app.get("/movies/:pk", (req,res)=>{
 app.listen(5000,()=>{
     console.log("App runnin on 5000")
 })
+
+//git add . & git commit -m "" in github show what you did/give updates
+//then git push
+
+//nodemon error? Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
