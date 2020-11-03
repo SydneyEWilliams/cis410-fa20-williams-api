@@ -3,9 +3,31 @@ const db = require('./dbConnectExec.js')
 
 const app = express();
 
+app.use(express.json()) //app recognizes json requests with this
 
 app.get("/hi",(req,res)=>{
 res.send("hello world")
+})
+
+app.post("/contacts", async (req,res)=>{
+    //res.send("creating user")
+    console.log("request body", req.body)
+
+    var nameFirst = req.body.nameFirst
+    var nameLast = req.body.nameLast
+    var email = req.body.email
+    var password = req.body.password
+
+    var emailCheckQuery = `SELECT email
+    FROM Contact
+    WHERE Email = '${email}'`
+
+    var existingUser = await db.executeQuery(emailCheckQuery)
+
+    //console.log("existing user", existingUser)
+    if(existingUser[0]){
+        return res.status(409).send("Please enter a different email")
+    }
 })
 
 
