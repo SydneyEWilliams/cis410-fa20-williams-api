@@ -8,10 +8,6 @@ const config = require("./config.js")
 const app = express();
 app.use(express.json()) //app recognizes json requests with this
 
- app.get("/hi",(req,res)=>{
- res.send("hello world")
-})
-
 // app.post("/customer", async (req,res)=>{
 //     console.log("request body", req.body)
 
@@ -55,11 +51,6 @@ app.use(express.json()) //app recognizes json requests with this
 //})
 
 
-// app.post()
-// app.put()
-// app.delete
-
-
 app.get("/videogame", (req,res)=>{
     //get data from database
     db.executeQuery(`SELECT * FROM VideoGame
@@ -76,33 +67,19 @@ app.get("/videogame", (req,res)=>{
     })
 })
 
-// app.get("/movies/:pk", (req,res)=>{
-//     var pk = req.params.pk
-//     //console.log("my pk:" + pk)
+app.get("/customer", (req,res)=>{
+    //get data from database
+    db.executeQuery(`SELECT * FROM Customer`)
 
-//     var myQuery =`SELECT * FROM movie
-//     LEFT JOIN Genre
-//     ON genre.GenrePK = movie.GenreFK
-//     WHERE moviePK = ${pk}`
+    .then((result)=>{
+        res.status(200).send(result)
+    })
 
-//     db.executeQuery(myQuery)
-//         .then((movies)=>{
-//             //console.log("Movies: ", movies
-            
-//             if(movies[0]){
-//                 res.send(movies[0])
-//             }
-
-//             else{
-//                 res.status(404).send("bad request")
-//             }
-//         })
-
-//         .catch((error)=>{
-//             console.log("Error in /movies/pk", error)
-//             res.status(500).send()
-//         })
-//})
+    .catch((error)=>{
+        console.log(error)
+        res.status(500).send()
+    })
+})
 
 
 app.listen(5000,()=>{
