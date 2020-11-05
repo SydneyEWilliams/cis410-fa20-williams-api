@@ -1,11 +1,11 @@
 const sql = require('mssql')
-const rockwellConfig = require("./config.js")
+const williamsConfig = require("./config.js")
 
 const config = {
-    user: rockwellConfig.DB.user,
-    password: rockwellConfig.DB.password,
-    server: rockwellConfig.DB.server, // You can use 'localhost\\instance' to connect to named instance
-    database: rockwellConfig.DB.database,
+    user: williamsConfig.DB.user,
+    password: williamsConfig.DB.password,
+    server: williamsConfig.DB.server, // You can use 'localhost\\instance' to connect to named instance
+    database: williamsConfig.DB.database,
 }
 
 async function executeQuery(aQuery){
@@ -17,6 +17,3 @@ async function executeQuery(aQuery){
     }
 
     module.exports = {executeQuery: executeQuery}
-    // executeQuery(`SELECT * FROM movie
-    //     LEFT JOIN Genre
-    //     ON genre.GenrePK = movie.GenreFK`)
