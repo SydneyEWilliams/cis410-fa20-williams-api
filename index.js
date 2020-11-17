@@ -81,6 +81,63 @@ app.get("/customer", (req,res)=>{
     })
 })
 
+app.post("/customers", async (req,res)=>{
+    //res.send("creating user")
+    //console.log("request body", req.body)
+
+    var nameFirst = req.body.nameFirst
+    var nameLast = req.body.nameLast
+    var email = req.body.email
+    var password = req.body.password
+
+    //validation
+    if(!nameFirst || !nameLast || !email || !password){
+         return res.status(400).send("bad request")
+    }
+
+    // nameFirst = nameFirst.replace("'","''") //where ' in names are get written properly
+    // nameLast = nameLast.replace("'","''") 
+
+    var emailCheckQuery = `SELECT Email
+    FROM Customer
+    WHERE Email = '${email}'`
+
+    var existingUser = await db.executeQuery(emailCheckQuery)
+
+    //console.log("existing user", existingUser)
+    if(existingUser[0]){
+    return res.status(409).send("Please enter a different email")
+    }
+
+    var hashedPassword = bcrypt.hashSync(password) //this hashes passwords for users you create in postman
+
+    var insertQuery = `INSERT INTO Customer(FirstName,LastName,Email,Password)
+    VALUES('${nameFirst}','${nameLast}','${email}','${hashedPassword}')` //this wont work, dont have permissions in SQL
+    
+    db.executeQuery(insertQuery)
+    .then(()=>{
+        res.status(201).send
+    })
+    .catch((err)=>{
+        console.log("error in POST /customers",err)
+        res.status(500).send()
+    }) // this whole writing user to database isnt gonna work unless its your database
+})
+
+// app.post("/me", auth, async(req,res)=>{
+//     //get data from database
+//     db.executeQuery(`SELECT * FROM Customer`)
+
+//     .then((result)=>{
+//         res.status(200).send(result)
+//     })
+
+//     .catch((error)=>{
+//         console.log(error)
+//         res.status(500).send()
+//     })
+// })
+
 
 app.listen(5000,()=>{
     console.log("App runnin' on 5000")
