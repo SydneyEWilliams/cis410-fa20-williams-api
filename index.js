@@ -92,11 +92,11 @@ app.post("/customers", async (req,res)=>{
 
     //validation
     if(!nameFirst || !nameLast || !email || !password){
-         return res.status(400).send("bad request")
+        return res.status(400).send("bad request")
     }
 
-    // nameFirst = nameFirst.replace("'","''") //where ' in names are get written properly
-    // nameLast = nameLast.replace("'","''") 
+    nameFirst = nameFirst.replace("'","''") //where ' in names are get written properly
+    nameLast = nameLast.replace("'","''") 
 
     var emailCheckQuery = `SELECT Email
     FROM Customer
@@ -123,6 +123,82 @@ app.post("/customers", async (req,res)=>{
         res.status(500).send()
     }) // this whole writing user to database isnt gonna work unless its your database
 })
+
+app.post("/me", async (req,res)=>{
+    //console.log(req.body)
+
+    var email = req.body.email
+    var password = req.body.password
+
+    if(!email||!password){
+        return res.status(400).send("Bad request")
+    }
+
+    //1. Check user email exists in database
+
+    var query = `SELECT * FROM Customer 
+    WHERE email = '${email}'`
+
+    //var result = await db.executeQuery(query)
+    //console.log(result)
+
+    let result;
+
+     try{
+         result = await db.executeQuery(query)
+     }catch(myError){
+         console.log("error with /customers/login",myError)
+         return res.status(500).send()
+     }
+
+    // console.log(result)
+
+     if(!result[0]){
+         return res.status(400).send("Invalid user credentials")
+     }
+
+    //2. Check their password
+
+    let user = result[0]
+    //console.log(user)
+
+    if(!bcrypt.compareSync(password, user.Password)){
+        console.log("invalid password")
+        return res.status(400).send("invalid user credentials")
+    }
+
+    //3. Generate token
+
+    let token = jwt.sign({pk: user.CustomerID}, config.JWT, {expiresIn: "60 minutes"})
+
+    console.log(token)
+
+    //4. Save token in database and send token & user info back to user
+
+    let setTokenQuery = `UPDATE Customer
+    SET Token = '${token}' 
+    WHERE CustomerID = ${user.CustomerID}` 
+    //send Bearer token in postman under authorization, paste in token
+
+    try{
+         await db.executeQuery(setTokenQuery)
+            
+         res.status(200).send({
+             token: token,
+             user: {
+                 FirstName: user.FirstName,
+                 LastName: user.LastName,
+                 Email: user.Email,
+                 CustomerID: user.CustomerID
+             } 
+         })
+     }
+     catch(myError){
+         console.log("Error setting user token",myError)
+         res.status(500).send()
+     }
+})
+
 
 // app.post("/me", auth, async(req,res)=>{
 //     //get data from database

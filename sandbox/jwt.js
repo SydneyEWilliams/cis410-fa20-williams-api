@@ -6,4 +6,4 @@ console.log("my token:", myToken)
 
 let myDecoded = jwt.verify(myToken, "secretPassword");
 
-console.log("my decode", myDecoded)
+console.log("my decoded", myDecoded)
