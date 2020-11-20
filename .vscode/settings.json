@@ -2,5 +2,7 @@
     "appService.zipIgnorePattern": [
         "node_modules{,/**}",
         ".vscode{,/**}"
-    ]
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/d880d303-2a63-447c-a2b7-69ae0feefcc4/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/cis410-fa20-williams-api",
+    "appService.deploySubpath": "."
 }
