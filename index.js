@@ -1,12 +1,14 @@
 const express = require("express")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const cors = require("cors")
 
 const db = require('./dbConnectExec.js')
 const config = require("./config.js")
 
 const app = express();
 app.use(express.json()) //app recognizes json requests with this
+app.use(cors())
 
 // app.post("/customer", async (req,res)=>{
 //     console.log("request body", req.body)
@@ -65,6 +67,33 @@ app.get("/videogame", (req,res)=>{
         console.log(error)
         res.status(500).send()
     })
+})
+
+app.get("/videogame/:pk", (req,res)=>{
+    var pk = req.params.pk
+    //console.log("my pk:" + pk)
+
+    var myQuery =`SELECT * FROM VideoGame
+    LEFT JOIN Developer
+    ON Developer.DevID = VideoGame.DevID
+    WHERE GameID = ${pk}`
+
+    db.executeQuery(myQuery)
+        .then((videogames)=>{
+            
+            if(videogames[0]){
+                res.send(videogames[0])
+            }
+
+            else{
+                res.status(404).send("bad request")
+            }
+        })
+
+        .catch((error)=>{
+            console.log("Error in /videogames/pk", error)
+            res.status(500).send()
+        })
 })
 
 app.get("/customer", (req,res)=>{
@@ -214,10 +243,15 @@ app.post("/me", async (req,res)=>{
 //     })
 // })
 
+const PORT = process.env.PORT || 5000
 
-app.listen(5000,()=>{
-    console.log("App runnin' on 5000")
+app.listen(PORT,()=>{
+    console.log(`App runnin on port ${PORT}`)
 })
+
+// app.listen(5000,()=>{
+//     console.log("App runnin' on 5000")
+// })
 
 //git add . & git commit -m "" in github show what you did/give updates
 //then git push
