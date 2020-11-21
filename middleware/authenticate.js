@@ -3,45 +3,48 @@
 const jwt = require("jsonwebtoken")
 const config = require("../config.js")
 const db = require("../dbConnectExec.js")
-const { request } = require("express")
+// const { request } = require("express")
 
-const auth = async(req,res,next)=>{
-    console.log(req.header('Authorization')) //logs token authorization
+const auth = async(req, res, next)=>{
+    //console.log(req.header('Authorization')) //logs token authorization
 
-    try{
+   try{
 
-        //1. Decode token
+         //1. Decode token
 
-        let myToken = req.header('Authorization').replace('Bearer ','')
+         let myToken = req.header('Authorization').replace('Bearer ','')
+         //console.log(myToken)
 
-        let decodedToken = jwt.verify(myToken, config.JWT)
+         let decodedToken = jwt.verify(myToken, config.JWT)
+         //console.log(decodedToken)
 
-        let customerID = decodedToken.customerID
+         let customerID = decodedToken.pk
+         console.log(customerID)
 
-        //2. Compare token to database token
+         //2. Compare token to database token
 
-        let query = `SELECT FirstName, LastName, Email, CustomerID 
-        FROM Customer
-        WHERE CustomerID = ${customerID} and Token = ${myToken}`
+         let query = `SELECT FirstName, LastName, Email, CustomerID 
+         FROM Customer
+         WHERE CustomerID = ${customerID} and Token = '${myToken}'`
 
-        let returnedUser = await db.executeQuery(query)
-        console.log(returnedUser)
+         let returnedUser = await db.executeQuery(query)
+         //console.log(returnedUser)
 
-        //3. Save user info in the request
+         //3. Save user info in the request
 
-        if(returnedUser[0]){
-            req.customer = returnedUser[0]
-            next()
-        }
-        else{
-            res.status(401).send("Authentication failed")
-        }
+         if(returnedUser[0]){
+             req.customer = returnedUser[0]
+             next()
+         }
+         else{
+             res.status(401).send("Authentication failed")
+         }
 
-    }catch(myError){
-            res.status(401).send("Authentication failed???")
-    }
+     }catch(myError){
+             res.status(401).send("Authentication failed??? Why here")
+     }
 
-    next()
-}
+//     next()
+ }
 
 module.exports = auth

@@ -7,6 +7,11 @@ const db = require('./dbConnectExec.js')
 const config = require("./config.js")
 const auth = require("./middleware/authenticate")
 
+// const auth = async(req, res, next)=>{ //this works in this file
+//     console.log(req.header('Authorization'))
+//     next()
+// }
+
 const app = express();
 app.use(express.json()) //app recognizes json requests with this
 app.use(cors())
@@ -321,36 +326,61 @@ app.post("/me", async (req,res)=>{ //for assignment due 11/17
      }
 })
 
-app.post("/reviews",auth,async (req,res)=>{ //edit this to get user authentication??
+app.post("/orders",auth,async (req,res)=>{ //edit this to get user authentication??
 
     try{
-        var movieFK = req.body.movieFK
-        var summary = req.body.summary
-        var rating = req.body.rating
+        var orderID = req.body.orderID; //used to be orderID
+        var dateReceived = req.body.dateReceived;
+        var quantity = req.body.quantity;
+        var gameID = req.body.gameID;
     
         //validation
-        if(!movieFK || !summary || !rating){
-            return res.status(400).send("bad request")
-        }
+        if(!orderID || !dateReceived || !quantity || !gameID){res.status(400).send("Bad request???")}
 
-        summary = summary.replace("'","''")
+            //console.log("Here is customer in /orders", req.customer)
+            //return res.status(400).send("here is your content")}
 
-        //console.log(req.contact)
-        //res.send("here is your response")
+            let insertQuery = `
+            INSERT INTO [dbo].[Order]
+            ([DateRecieved]
+            ,[Quantity]
+            ,[CustomerID]
+            ,[GameID])
+ OUTPUT inserted.OrderID, inserted.DateRecieved, inserted.Quantity, inserted.GameID
+      VALUES
+            ('${dateReceived}'
+            ,'${quantity}'
+            ,'${req.customer.customerID}'
+            ,'${gameID}')`
 
-        let insertQuery = `INSERT INTO Review(summary, Rating, MovieFK, ContactFK)
-        OUTPUT inserted.ReviewFK, insterted.Summary, inserted.Rating, inserted.MovieFK
-        VALUES ("${summary}","${rating}","${movieFK},"${summary},"${req.contact.ContactPK}")`
+            let insertedOrder = await db.executeQuery(insertQuery)
 
-        let insertedReview = await db.executeQuery(insertQuery)
-
-        res.status(201).send(insertedReview[0])
+            console.log(insertedOrder)
+            res.status(201).send(insertedOrder)
     }
         catch(error){
-            console.log("error in POST /review",error)
+            console.log("Error in POST /orders", error);
             res.status(500).send()
         }
-})
+
+//         summary = summary.replace("'","''") //for more text, not for me tho
+
+//         //console.log(req.contact)
+//         //res.send("here is your response")
+
+//         let insertQuery = `INSERT INTO Review(summary, Rating, MovieFK, ContactFK)
+//         OUTPUT inserted.ReviewFK, insterted.Summary, inserted.Rating, inserted.MovieFK
+//         VALUES ("${summary}","${rating}","${movieFK},"${summary},"${req.contact.ContactPK}")`
+
+//         let insertedReview = await db.executeQuery(insertQuery)
+
+//         res.status(201).send(insertedReview[0])
+//     }
+//         catch(error){
+//             console.log("error in POST /review",error)
+//             res.status(500).send()
+//         }
+ })
 
 // app.post("/me", auth, async(req,res)=>{
 //     //get data from database
