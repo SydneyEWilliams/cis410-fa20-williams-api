@@ -241,7 +241,7 @@ app.post("/customers/login", async (req,res)=>{
 app.post("/customers/logout", auth, (req,res)=>{
     var query = `UPDATE Customer 
     SET Token = NULL 
-    WHERE CustomerID = ${req.customer.CustomerID}`
+    WHERE CustomerID = ${req.customer.customerID}`
 
     db.executeQuery(query)
     .then(()=>{res.status(200).send()})
@@ -329,13 +329,13 @@ app.post("/me", async (req,res)=>{ //for assignment due 11/17
 app.post("/orders",auth,async (req,res)=>{ //edit this to get user authentication??
 
     try{
-        var orderID = req.body.orderID; //used to be orderID
+        //var orderID = req.body.orderID; //used to be orderID
         var dateReceived = req.body.dateReceived;
         var quantity = req.body.quantity;
         var gameID = req.body.gameID;
     
         //validation
-        if(!orderID || !dateReceived || !quantity || !gameID){res.status(400).send("Bad request???")}
+        if(!dateReceived || !quantity || !gameID){res.status(400).send("Bad request???")}
 
             //console.log("Here is customer in /orders", req.customer)
             //return res.status(400).send("here is your content")}
@@ -356,12 +356,16 @@ app.post("/orders",auth,async (req,res)=>{ //edit this to get user authenticatio
             let insertedOrder = await db.executeQuery(insertQuery)
 
             console.log(insertedOrder)
-            res.status(201).send(insertedOrder)
+            res.status(201).send(insertedOrder[0])
     }
         catch(error){
             console.log("Error in POST /orders", error);
             res.status(500).send()
         }
+
+app.get("/orders/me", auth, (req,res)=>{
+     res.send(req.customer) //user verification using tokens
+    })
 
 //         summary = summary.replace("'","''") //for more text, not for me tho
 

@@ -41,7 +41,7 @@ const auth = async(req, res, next)=>{
          }
 
      }catch(myError){
-             res.status(401).send("Authentication failed??? Why here")
+             res.status(401).send("Authentication failed. Invalid access.")
      }
 
 //     next()
