@@ -9,7 +9,7 @@ const auth = require("./middleware/authenticate")
 
 // const auth = async(req, res, next)=>{ //this works in this file
 //     console.log(req.header('Authorization'))
-//     next()
+//     
 // }
 
 const app = express();
